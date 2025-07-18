@@ -1,10 +1,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { RegisterFormData } from "@/lib/types";
-
-interface FormErrors {
-  [key: string]: string;
-}
+import type { FormErrors } from "@/lib/types";
 
 interface RegistrationState {
   formData: RegisterFormData;

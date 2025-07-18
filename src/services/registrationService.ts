@@ -3,9 +3,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import type { RegisterFormData } from "@/lib/types";
 import { registerSchema } from "@/lib/validations/auth";
-interface FormErrors {
-  [key: string]: string;
-}
+import type { FormErrors } from "@/lib/types";
 
 const FIREBASE_ERROR_MESSAGES = {
   "auth/email-already-in-use": "Este email já está em uso",

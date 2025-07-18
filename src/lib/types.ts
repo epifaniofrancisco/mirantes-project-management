@@ -1,4 +1,4 @@
-import { registerSchema } from "@/lib/validations/auth";
+import { registerSchema, loginSchema } from "@/lib/validations/auth";
 import type { z } from "zod";
 
 export interface User {
@@ -21,3 +21,9 @@ export type UserData = {
 };
 
 export type RegisterFormData = z.infer<typeof registerSchema>;
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+
+export interface FormErrors {
+  [key: string]: string;
+}
