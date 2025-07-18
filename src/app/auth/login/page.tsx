@@ -14,17 +14,15 @@ import { AuthLink } from "@/components/auth/AuthLink";
 import { useCallback } from "react";
 import { FormField } from "@/components/auth/FormField";
 import { LoadingButton } from "@/components/auth/LoadingButton";
-import { useLoginForm } from "@/hooks/useLoginForm";
+import { useAuthForm } from "@/hooks/useAuthForm";
 import { LoginService } from "@/services/loginService";
-import type { LoginFormData, FormErrors } from "@/lib/types";
+import type { LoginFormData } from "@/lib/types";
 import { ErrorAlert } from "@/components/base/ErrorAlert";
 
-export interface LoginState {
-  formData: LoginFormData;
-  errors: FormErrors;
-  isLoading: boolean;
-  generalError: string;
-}
+const INITIAL_LOGIN_DATA: LoginFormData = {
+  email: "",
+  password: "",
+};
 
 export default function LoginPage(): React.ReactElement {
   const {
@@ -35,7 +33,7 @@ export default function LoginPage(): React.ReactElement {
     setLoading,
     resetErrors,
     router,
-  } = useLoginForm();
+  } = useAuthForm(INITIAL_LOGIN_DATA);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {

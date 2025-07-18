@@ -1,38 +1,34 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { RegisterFormData } from "@/lib/types";
-import type { FormErrors } from "@/lib/types";
+import type { LoginFormData, FormErrors } from "@/lib/types";
 
-interface RegistrationState {
-  formData: RegisterFormData;
+export interface AuthFormState<T> {
+  formData: T;
   errors: FormErrors;
   isLoading: boolean;
   generalError: string;
 }
 
-const INITIAL_FORM_DATA: RegisterFormData = {
-  name: "",
-  email: "",
-  password: "",
-};
-
-const INITIAL_STATE: RegistrationState = {
-  formData: INITIAL_FORM_DATA,
-  errors: {},
-  isLoading: false,
-  generalError: "",
-};
-
-export const useRegistrationForm = () => {
-  const [state, setState] = useState<RegistrationState>(INITIAL_STATE);
+export const useAuthForm = <T extends Record<string, any>>(
+  initialFormData: T,
+) => {
   const router = useRouter();
 
+  const INITIAL_STATE: AuthFormState<T> = {
+    formData: initialFormData,
+    errors: {},
+    isLoading: false,
+    generalError: "",
+  };
+
+  const [state, setState] = useState<AuthFormState<T>>(INITIAL_STATE);
+
   const updateFormData = useCallback(
-    (field: keyof RegisterFormData, value: string) => {
+    (field: keyof T, value: string) => {
       setState((prev) => ({
         ...prev,
         formData: { ...prev.formData, [field]: value },
-        errors: { ...prev.errors, [field]: "" },
+        errors: { ...prev.errors, [field]: "" }, // Clear field error on change
       }));
     },
     [],
