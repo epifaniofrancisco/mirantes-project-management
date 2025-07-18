@@ -3,32 +3,22 @@ import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import type { RegisterFormData } from "@/lib/types";
 import { registerSchema } from "@/lib/validations/auth";
-import type { FormErrors } from "@/lib/types";
-
-const FIREBASE_ERROR_MESSAGES = {
-  "auth/email-already-in-use": "Este email já está em uso",
-  "auth/weak-password": "Senha muito fraca",
-  "auth/invalid-email": "Email inválido",
-} as const;
+import {
+  AuthUtils,
+  type AuthResult,
+  type FirebaseErrorResult,
+} from "./authUtils";
+import {
+  AUTH_ERROR_MESSAGES,
+  FIELD_ERROR_MAPPINGS,
+  DEFAULT_MESSAGES,
+} from "@/constants/authErrors";
 
 export class RegistrationService {
   static async validateFormData(
     formData: RegisterFormData,
-  ): Promise<{ success: boolean; errors?: FormErrors }> {
-    const validationResult = registerSchema.safeParse(formData);
-
-    if (!validationResult.success) {
-      const errors: FormErrors = {};
-      validationResult.error.issues.forEach((issue) => {
-        const field = issue.path[0];
-        if (field && typeof field === "string") {
-          errors[field] = issue.message;
-        }
-      });
-      return { success: false, errors };
-    }
-
-    return { success: true };
+  ): Promise<AuthResult<RegisterFormData>> {
+    return AuthUtils.validateFormData(formData, registerSchema);
   }
 
   static async createUser(formData: RegisterFormData): Promise<void> {
@@ -48,39 +38,12 @@ export class RegistrationService {
     });
   }
 
-  static parseFirebaseError(error: any): {
-    type: "field" | "general";
-    message: string;
-    field?: string;
-  } {
-    if (error.code) {
-      const message =
-        FIREBASE_ERROR_MESSAGES[
-          error.code as keyof typeof FIREBASE_ERROR_MESSAGES
-        ];
-
-      if (error.code === "auth/weak-password") {
-        return {
-          type: "field",
-          message: message || "Senha muito fraca",
-          field: "password",
-        };
-      }
-
-      if (error.code === "auth/invalid-email") {
-        return {
-          type: "field",
-          message: message || "Email inválido",
-          field: "email",
-        };
-      }
-
-      return {
-        type: "general",
-        message: message || "Erro ao criar conta. Tente novamente.",
-      };
-    }
-
-    return { type: "general", message: "Erro inesperado. Tente novamente." };
+  static parseFirebaseError(error: any): FirebaseErrorResult {
+    return AuthUtils.parseFirebaseError(
+      error,
+      AUTH_ERROR_MESSAGES,
+      FIELD_ERROR_MAPPINGS.register,
+      DEFAULT_MESSAGES.register,
+    );
   }
 }
