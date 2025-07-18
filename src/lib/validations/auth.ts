@@ -20,3 +20,8 @@ export const registerSchema = z.object({
       "Senha deve conter pelo menos um caractere especial",
     ),
 });
+
+export const loginSchema = z.object({
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  password: z.string().min(1, "Senha é obrigatória"),
+});

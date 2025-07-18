@@ -21,10 +21,10 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 ### 🔐 Autenticação e Conta de Usuário
 
 - [x] Formulário de registro com validação
-- [ ] Formulário de login com validação
+- [x] Formulário de login com validação
 - [x] Logout
 - [x] Persistência da sessão de usuário
-- [ ] Redirecionamento após login/register
+- [x] Redirecionamento após login/register
 - [x] Proteção de rotas privadas
 
 ---
