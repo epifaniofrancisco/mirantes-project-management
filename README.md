@@ -10,7 +10,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] **Next.js**
 - [x] **TypeScript**
 - [x] **TailwindCSS**
-- [ ] **Firebase** (Auth, Firestore, Storage, Notifications)
+- [x] **Firebase** (Auth, Firestore, Storage, Notifications)
 - [ ] **Zustand** (gerenciamento de estado)
 - [ ] **React DnD** (drag & drop para Kanban)
 
@@ -20,12 +20,12 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 ### 🔐 Autenticação e Conta de Usuário
 
-- [ ] Formulário de registro com validação
+- [x] Formulário de registro com validação
 - [ ] Formulário de login com validação
-- [ ] Logout
-- [ ] Persistência da sessão de usuário
-- [ ] Redirecionamento após login
-- [ ] Proteção de rotas privadas
+- [x] Logout
+- [x] Persistência da sessão de usuário
+- [ ] Redirecionamento após login/register
+- [x] Proteção de rotas privadas
 
 ---
 
