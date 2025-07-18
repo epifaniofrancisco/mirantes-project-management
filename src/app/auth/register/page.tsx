@@ -10,20 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { User, Mail, Lock, AlertCircle } from "lucide-react";
+import { User, Mail, Lock } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { AuthLink } from "@/components/auth/AuthLink";
 import { LoadingButton } from "@/components/auth/LoadingButton";
 import { useRegistrationForm } from "@/hooks/useRegistrationForm";
 import { RegistrationService } from "@/services/registrationService";
-
-const ErrorAlert: React.FC<{ message: string }> = ({ message }) => (
-  <Alert variant="destructive">
-    <AlertCircle className="h-4 w-4" />
-    <AlertDescription>{message}</AlertDescription>
-  </Alert>
-);
+import { ErrorAlert } from "@/components/base/ErrorAlert";
 
 export default function RegisterPage(): React.ReactElement {
   const {
