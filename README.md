@@ -1,36 +1,146 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 MiraTask - Aplicativo de Gerenciamento de Projetos
 
-## Getting Started
+Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e **Firebase**. Interface intuitiva, colaboração em tempo real e funcionalidades avançadas para organização de equipes e tarefas.
 
-First, run the development server:
+---
+
+## 🧰 Tecnologias Utilizadas
+
+- [x] **React.js**
+- [x] **Next.js**
+- [x] **TypeScript**
+- [x] **TailwindCSS**
+- [ ] **Firebase** (Auth, Firestore, Storage, Notifications)
+- [ ] **Zustand** (gerenciamento de estado)
+- [ ] **React DnD** (drag & drop para Kanban)
+
+---
+
+## 🎯 Funcionalidades
+
+### 🔐 Autenticação e Conta de Usuário
+
+- [ ] Formulário de registro com validação
+- [ ] Formulário de login com validação
+- [ ] Logout
+- [ ] Persistência da sessão de usuário
+- [ ] Redirecionamento após login
+- [ ] Proteção de rotas privadas
+
+---
+
+### 📁 Gestão de Projetos
+
+- [ ] Dashboard com projetos do usuário
+- [ ] Criar projeto (título, descrição, datas)
+- [ ] Editar projeto
+- [ ] Detalhes do projeto (membros, tarefas)
+- [ ] Atribuir membros a um projeto
+
+---
+
+### ✅ Tarefas
+
+- [ ] Criar tarefas com título, descrição, status, responsável, datas
+- [ ] Editar tarefas
+- [ ] Atualizar status: pendente / em andamento / concluída
+- [ ] Adicionar etiquetas (tags)
+- [ ] Anexar arquivos (imagens ou documentos)
+
+---
+
+### 🧾 Visualizações
+
+- [ ] Lista detalhada de tarefas
+- [ ] Visualização Kanban com drag & drop (React DnD)
+- [ ] Filtros por status, data, responsável
+- [ ] Busca por título da tarefa
+
+---
+
+### 👥 Colaboração
+
+- [ ] Comentários com `@menção`
+- [ ] Histórico de atividades por tarefa
+- [ ] Atribuição de tarefas a membros
+- [ ] Notificações para menções e alterações
+
+---
+
+### 🧩 Equipes e Quadros
+
+- [ ] Criar e editar equipes
+- [ ] Criar quadros por equipe
+- [ ] Gerenciar permissões (admin/editor/leitor)
+- [ ] Notificação ao ser adicionado a uma equipe
+- [ ] Visão geral da equipe e quadros
+
+---
+
+### 🔔 Notificações
+
+- [ ] Atualizações em tempo real (Firestore)
+- [ ] Alertas para tarefas vencidas
+- [ ] Notificação ao ser mencionado ou atribuído
+
+---
+
+## 📦 MVP (Produto Mínimo Viável)
+
+> ✅ Estas são as **funcionalidades mínimas** que precisam estar prontas para validação e entrega:
+
+- [ ] Autenticação (login, cadastro, logout)
+- [ ] Dashboard de projetos
+- [ ] Criar e visualizar projeto
+- [ ] Criar e visualizar tarefas
+- [ ] Atualizar status de tarefas
+- [ ] Atribuição de membros
+- [ ] Comentários básicos
+- [ ] Sincronização em tempo real (Firestore)
+
+---
+
+## 📊 Checklist Final de Entrega
+
+### ✅ Funcionalidades principais
+
+- [ ] Autenticação com Firebase
+- [ ] CRUD de projetos
+- [ ] CRUD de tarefas
+- [ ] Visualização em Kanban
+- [ ] Drag & Drop
+- [ ] Atribuição de responsáveis
+- [ ] Comentários em tarefas
+- [ ] Persistência em tempo real
+
+### 🧪 Funcionalidades avançadas (opcionais)
+
+- [ ] Filtros e busca
+- [ ] Etiquetas em tarefas
+- [ ] Estatísticas por projeto
+- [ ] Histórico de atividades
+- [ ] Upload de anexos
+
+---
+
+## 🧪 Testes Manuais
+
+- [ ] Criar e logar com conta de usuário
+- [ ] Criar projeto e adicionar tarefas
+- [ ] Atualizar status das tarefas
+- [ ] Atribuir tarefas a outros usuários
+- [ ] Visualizar alterações em tempo real
+- [ ] Ver comentários sendo salvos
+
+---
+
+## 🛠️ Como Rodar Localmente
 
 ```bash
+# Instale as dependências
+npm install
+
+# Crie o arquivo .env.local e adicione as credenciais do Firebase
+
+# Rode o projeto
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
