@@ -1,10 +1,9 @@
 import type React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { RegisterFormData } from "@/lib/types";
 
-interface FormFieldProps {
-  id: keyof RegisterFormData;
+interface FormFieldProps<T = string> {
+  id: T;
   label: string;
   type: string;
   placeholder: string;
@@ -12,10 +11,10 @@ interface FormFieldProps {
   error?: string;
   isLoading: boolean;
   icon: React.ComponentType<{ className?: string }>;
-  onChange: (field: keyof RegisterFormData, value: string) => void;
+  onChange: (field: T, value: string) => void;
 }
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField = <T extends string>({
   id,
   label,
   type,
@@ -25,7 +24,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   isLoading,
   icon: Icon,
   onChange,
-}) => (
+}: FormFieldProps<T>): React.ReactElement => (
   <div className="space-y-2">
     <Label htmlFor={id}>{label}</Label>
     <div className="relative">
