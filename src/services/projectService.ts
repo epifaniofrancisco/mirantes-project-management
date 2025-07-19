@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { projectSchema } from "@/lib/validations/project";
 import { AuthUtils, type AuthResult } from "./authUtils";
@@ -60,6 +60,15 @@ export class ProjectService {
     }
   }
 
+  static async deleteProject(projectId: string): Promise<void> {
+    try {
+      await deleteDoc(doc(db, "projects", projectId));
+    } catch (error) {
+      console.error("Erro ao deletar projeto:", error);
+      throw new Error("Falha ao deletar projeto do banco de dados");
+    }
+  }
+
   static parseCreateProjectError(error: any): string {
     if (error.message?.includes("banco de dados")) {
       return error.message;
@@ -70,5 +79,13 @@ export class ProjectService {
     }
 
     return "Erro inesperado ao criar projeto. Tente novamente.";
+  }
+
+  static parseDeleteProjectError(error: any): string {
+    if (error.message?.includes("banco de dados")) {
+      return error.message;
+    }
+
+    return "Erro inesperado ao deletar projeto. Tente novamente.";
   }
 }

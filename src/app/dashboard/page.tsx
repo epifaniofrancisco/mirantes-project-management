@@ -9,6 +9,8 @@ import { useDashboard } from "@/hooks/useDashboard";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { UserInfo } from "@/components/UserInfo";
+import { ConfirmDialog } from "@/components/base/ConfirmDialog";
+import { ErrorAlert } from "@/components/base/ErrorAlert";
 
 interface EmptyStateProps {
   onAction: () => void;
@@ -42,10 +44,16 @@ export default function DashboardPage(): React.ReactElement {
     projects,
     user,
     loading,
+    deleteDialogOpen,
+    deleteError,
+    isDeleting,
     handleSignOut,
     navigateToNewProject,
     navigateToProject,
     navigateToEditProject,
+    handleDeleteProject,
+    confirmDeleteProject,
+    cancelDeleteProject,
   } = useDashboard();
 
   if (loading) {
@@ -92,11 +100,35 @@ export default function DashboardPage(): React.ReactElement {
                   project={project}
                   onViewDetails={navigateToProject}
                   onEdit={navigateToEditProject}
+                  onDelete={handleDeleteProject}
                 />
               ))}
             </div>
           )}
         </div>
+
+        {/* Dialog de Confirmação de Delete */}
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={cancelDeleteProject}
+          title="Deletar Projeto"
+          description="Tem certeza que deseja deletar este projeto? Esta ação não pode ser desfeita."
+          confirmText="Deletar"
+          cancelText="Cancelar"
+          variant="destructive"
+          isLoading={isDeleting}
+          onConfirm={confirmDeleteProject}
+        />
+
+        {/* Alert de Erro */}
+        {deleteError && (
+          <div className="fixed right-4 bottom-4 z-50 max-w-md">
+            <ErrorAlert
+              message={deleteError}
+
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -9,9 +9,11 @@ import {
   onSnapshot,
   doc,
   getDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import type { Project, User } from "@/lib/types";
+import type { User as FirebaseUser } from "firebase/auth";
 
 interface DashboardState {
   projects: Project[];
@@ -25,10 +27,15 @@ export const useDashboard = () => {
     user: null,
     loading: true,
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string>("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   const router = useRouter();
 
   const createUserFromFirebaseUser = useCallback(
-    (firebaseUser: any, userData?: any): User => {
+    (firebaseUser: FirebaseUser, userData?: any): User => {
       return {
         id: firebaseUser.uid,
         name:
@@ -47,7 +54,7 @@ export const useDashboard = () => {
   );
 
   const fetchUserData = useCallback(
-    async (firebaseUser: any): Promise<User> => {
+    async (firebaseUser: FirebaseUser): Promise<User> => {
       try {
         const userDocRef = doc(db, "users", firebaseUser.uid);
         const userDoc = await getDoc(userDocRef);
@@ -136,11 +143,50 @@ export const useDashboard = () => {
     [navigate],
   );
 
+  const handleDeleteProject = useCallback((projectId: string) => {
+    setProjectToDelete(projectId);
+    setDeleteDialogOpen(true);
+    setDeleteError("");
+  }, []);
+
+  const confirmDeleteProject = useCallback(async () => {
+    if (!projectToDelete) return;
+
+    setIsDeleting(true);
+    setDeleteError("");
+
+    try {
+      await deleteDoc(doc(db, "projects", projectToDelete));
+      
+      // Sucesso - fechar dialog e limpar estado
+      setDeleteDialogOpen(false);
+      setProjectToDelete(null);
+      setDeleteError("");
+    } catch (error) {
+      console.error("Erro ao deletar projeto:", error);
+      setDeleteError("Erro ao deletar projeto. Tente novamente.");
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [projectToDelete]);
+
+  const cancelDeleteProject = useCallback(() => {
+    setDeleteDialogOpen(false);
+    setProjectToDelete(null);
+    setDeleteError("");
+  }, []);
+
   return {
     ...state,
+    deleteDialogOpen,
+    deleteError,
+    isDeleting,
     handleSignOut,
     navigateToNewProject,
     navigateToProject,
     navigateToEditProject,
+    handleDeleteProject,
+    confirmDeleteProject,
+    cancelDeleteProject,
   };
 };

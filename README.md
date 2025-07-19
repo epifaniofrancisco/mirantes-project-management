@@ -31,8 +31,8 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 ### 📁 Gestão de Projetos
 
-- [ ] Dashboard com projetos do usuário
-- [ ] Criar projeto (título, descrição, datas)
+- [x] Dashboard com projetos do usuário
+- [x] Criar projeto (título, descrição, datas)
 - [ ] Editar projeto
 - [ ] Detalhes do projeto (membros, tarefas)
 - [ ] Atribuir membros a um projeto
