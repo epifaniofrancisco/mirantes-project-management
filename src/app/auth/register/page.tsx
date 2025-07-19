@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { User, Mail, Lock } from "lucide-react";
-import { FormField } from "@/components/auth/FormField";
+import { FormField } from "@/components/base/FormField";
 import { AuthLink } from "@/components/auth/AuthLink";
 import { LoadingButton } from "@/components/auth/LoadingButton";
 import { useBaseForm } from "@/hooks/useBaseForm";

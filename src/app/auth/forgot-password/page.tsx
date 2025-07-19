@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useCallback, useState } from "react";
-import { FormField } from "@/components/auth/FormField";
+import { FormField } from "@/components/base/FormField";
 import { LoadingButton } from "@/components/auth/LoadingButton";
 import { ForgotPasswordService } from "@/services/forgotPasswordService";
 import {

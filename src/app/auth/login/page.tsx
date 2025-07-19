@@ -11,7 +11,7 @@ import {
 import { Mail, Lock } from "lucide-react";
 import { AuthLink } from "@/components/auth/AuthLink";
 import { useCallback } from "react";
-import { FormField } from "@/components/auth/FormField";
+import { FormField } from "@/components/base/FormField";
 import { LoadingButton } from "@/components/auth/LoadingButton";
 import { useBaseForm } from "@/hooks/useBaseForm";
 import { LoginService } from "@/services/loginService";
