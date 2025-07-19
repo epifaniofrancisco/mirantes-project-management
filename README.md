@@ -35,7 +35,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] Criar projeto (título, descrição, datas)
 - [x] Editar projeto
 - [x] Detalhes do projeto (membros, tarefas)
-- [ ] Atribuir membros a um projeto
+- [x] Atribuir membros a um projeto
 
 ---
 
@@ -94,7 +94,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] Criar e visualizar projeto
 - [ ] Criar e visualizar tarefas
 - [ ] Atualizar status de tarefas
-- [ ] Atribuição de membros
+- [x] Atribuição de membros
 - [ ] Comentários básicos
 - [x] Sincronização em tempo real (Firestore)
 
