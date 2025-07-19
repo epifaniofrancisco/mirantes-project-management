@@ -12,7 +12,15 @@ export const projectSchema = z
       .min(10, "Descrição deve ter pelo menos 10 caracteres")
       .max(500, "Descrição deve ter no máximo 500 caracteres"),
 
-    startDate: z.string().min(1, "Data de início é obrigatória"),
+    startDate: z
+      .string()
+      .min(1, "Data de início é obrigatória")
+      .refine((date) => {
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return selectedDate >= today;
+      }, "Data de início não pode ser no passado"),
 
     endDate: z.string().min(1, "Data de fim é obrigatória"),
   })
