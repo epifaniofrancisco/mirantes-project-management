@@ -7,7 +7,7 @@ export const registerSchema = z.object({
     .max(50, "Nome deve ter no máximo 50 caracteres")
     .regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Nome deve conter apenas letras e espaços"),
 
-  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  email: z.email("Email inválido").min(1, "Email é obrigatório"),
 
   password: z
     .string()
@@ -22,6 +22,12 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  email: z.email("Email inválido").min(1, "Email é obrigatório"),
   password: z.string().min(1, "Senha é obrigatória"),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .email("Formato de email inválido")
+    .min(1, "Email é obrigatório")
 });

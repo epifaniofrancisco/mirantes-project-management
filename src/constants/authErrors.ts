@@ -9,6 +9,9 @@ export const AUTH_ERROR_MESSAGES = {
   // Registration errors
   "auth/email-already-in-use": "Este email já está em uso",
   "auth/weak-password": "Senha muito fraca",
+
+  // Forgot password erros
+  "auth/user-not-found-forgot": "Não encontramos uma conta criada com este email",
 } as const;
 
 export const FIELD_ERROR_MAPPINGS = {
@@ -19,10 +22,14 @@ export const FIELD_ERROR_MAPPINGS = {
     "auth/weak-password": "password",
     "auth/invalid-email": "email",
   },
+  forgotPassword: {
+    "auth/invalid-email": "email",
+  },
 } as const;
 
 export const DEFAULT_MESSAGES = {
   login: "Erro ao fazer login. Tente novamente.",
   register: "Erro ao criar conta. Tente novamente.",
+  forgotPassword: "Erro ao enviar email de recuperação. Tente novamente.",
   general: "Erro inesperado. Tente novamente.",
 } as const;
