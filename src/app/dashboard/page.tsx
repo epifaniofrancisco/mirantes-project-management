@@ -1,103 +1,102 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import type React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Plus } from "lucide-react";
 import LoadingSpinner from "@/components/base/LoadingSpinner";
-import { LogOut } from "lucide-react";
-import type { UserData } from "@/lib/types";
+import { useDashboard } from "@/hooks/useDashboard";
+import { ProjectCard } from "@/components/projects/ProjectCard";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { UserInfo } from "@/components/UserInfo";
 
-export default function DashboardPage() {
-  const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+interface EmptyStateProps {
+  onAction: () => void;
+}
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-          if (userDoc.exists()) {
-            setUser(userDoc.data() as UserData);
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      } else {
-        router.push("/auth/register");
-      }
-      setLoading(false);
-    });
+export const EmptyState: React.FC<EmptyStateProps> = ({ onAction }) => (
+  <Card className="py-8 text-center sm:py-12">
+    <CardContent>
+      <div className="flex flex-col items-center space-y-3 sm:space-y-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 sm:h-16 sm:w-16">
+          <Plus className="h-6 w-6 text-gray-400 sm:h-8 sm:w-8" />
+        </div>
+        <div className="px-4">
+          <h3 className="text-base font-medium text-gray-900 sm:text-lg">
+            Nenhum projeto encontrado
+          </h3>
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
+            Comece criando seu primeiro projeto
+          </p>
+        </div>
+        <Button onClick={onAction} className="w-full sm:w-auto">
+          Criar Primeiro Projeto
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+);
 
-    return () => unsubscribe();
-  }, [router]);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      router.push("/auth/register");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
+export default function DashboardPage(): React.ReactElement {
+  const {
+    projects,
+    user,
+    loading,
+    handleSignOut,
+    navigateToNewProject,
+    navigateToProject,
+    navigateToEditProject,
+  } = useDashboard();
 
   if (loading) {
-    return (
-      <LoadingSpinner />
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) {
-    return null;
+    return <LoadingSpinner />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-2xl mx-auto pt-8">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Dashboard</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold">{user.name}</h2>
-                <p className="text-slate-600">{user.email}</p>
-                <p className="text-sm text-slate-500 mt-2">
-                  Membro desde{" "}
-                  {new Date(user.createdAt).toLocaleDateString("pt-BR")}
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-2 sm:p-4">
+      <div className="container mx-auto px-2 py-4 sm:px-4 sm:py-8">
+        <DashboardHeader
+          user={user}
+          onNewProject={navigateToNewProject}
+          onSignOut={handleSignOut}
+        />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-50 rounded-lg">
-                <h3 className="font-medium text-slate-700">ID do Usuário</h3>
-                <p className="text-sm text-slate-600 font-mono">{user.id}</p>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-lg">
-                <h3 className="font-medium text-slate-700">Data de Criação</h3>
-                <p className="text-sm text-slate-600">
-                  {new Date(user.createdAt).toLocaleString("pt-BR")}
-                </p>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleSignOut}
-              variant="outline"
-              className="w-full bg-transparent"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sair
-            </Button>
+        {/* Card de Informações do Usuário */}
+        <Card className="mb-6 sm:mb-8">
+          <CardContent className="p-4 sm:pt-6">
+            <UserInfo
+              user={user}
+              projectsCount={projects.length}
+              layout="horizontal"
+            />
           </CardContent>
         </Card>
+
+        {/* Seção de Projetos */}
+        <div className="mb-6">
+          <h2 className="mb-3 text-xl font-bold text-gray-900 sm:mb-4 sm:text-2xl">
+            Meus projetos
+          </h2>
+
+          {projects.length === 0 ? (
+            <EmptyState onAction={navigateToNewProject} />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {projects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onViewDetails={navigateToProject}
+                  onEdit={navigateToEditProject}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ export function AuthCheck({
   children,
   redirectTo = "/auth/login",
   requireAuth = true,
-}: AuthCheckProps) {
+}: Readonly<AuthCheckProps>) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
