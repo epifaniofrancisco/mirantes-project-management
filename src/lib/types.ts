@@ -22,11 +22,12 @@ export interface Project {
   description: string;
   startDate: string;
   endDate: string;
+  status: ProjectStatus;
   createdBy: string;
   members: ProjectMember[];
+  memberIds: string[];
   createdAt: string;
   updatedAt: string;
-  status: ProjectStatus;
 }
 
 export interface ProjectMember {

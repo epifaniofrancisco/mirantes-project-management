@@ -73,29 +73,80 @@ export const useDashboard = () => {
     [createUserFromFirebaseUser],
   );
 
-  const setupProjectsListener = useCallback((userId: string) => {
-    const projectsQuery = query(
-      collection(db, "projects"),
-      where("createdBy", "==", userId),
-      orderBy("updatedAt", "desc"),
-    );
+  
 
-    return onSnapshot(
-      projectsQuery,
-      (snapshot) => {
-        const projects = snapshot.docs.map((doc) => ({
+  // ...existing code...
+
+// ✅ VERSÃO FINAL CORRIGIDA
+const setupProjectsListener = useCallback((userId: string) => {
+  // Projetos criados pelo usuário
+  const ownedProjectsQuery = query(
+    collection(db, "projects"),
+    where("createdBy", "==", userId),
+    orderBy("updatedAt", "desc"),
+  );
+
+  // Projetos onde o usuário é membro (usando array-contains com ID simples)
+  const memberProjectsQuery = query(
+    collection(db, "projects"),
+    where("memberIds", "array-contains", userId), // ✅ CORRIGIDO: Usar array simples
+    orderBy("updatedAt", "desc"),
+  );
+
+  const projectsMap = new Map<string, Project>();
+
+  // Listener para projetos criados
+  const unsubscribeOwned = onSnapshot(
+    ownedProjectsQuery,
+    (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        projectsMap.set(doc.id, {
           id: doc.id,
           ...doc.data(),
-        })) as Project[];
+        } as Project);
+      });
 
-        setState((prev) => ({ ...prev, projects, loading: false }));
-      },
-      (error) => {
-        console.error("Erro ao buscar projetos:", error);
-        setState((prev) => ({ ...prev, loading: false }));
-      },
+      updateProjectsState();
+    },
+    (error) => {
+      console.error("Erro ao buscar projetos criados:", error);
+      setState((prev) => ({ ...prev, loading: false }));
+    },
+  );
+
+  // Listener para projetos onde é membro
+  const unsubscribeMember = onSnapshot(
+    memberProjectsQuery,
+    (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        projectsMap.set(doc.id, {
+          id: doc.id,
+          ...doc.data(),
+        } as Project);
+      });
+
+      updateProjectsState();
+    },
+    (error) => {
+      console.error("Erro ao buscar projetos como membro:", error);
+      setState((prev) => ({ ...prev, loading: false }));
+    },
+  );
+
+  function updateProjectsState() {
+    const projects = Array.from(projectsMap.values()).sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
-  }, []);
+
+    setState((prev) => ({ ...prev, projects, loading: false }));
+  }
+
+  // Retornar função que cancela ambos os listeners
+  return () => {
+    unsubscribeOwned();
+    unsubscribeMember();
+  };
+}, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -106,6 +157,7 @@ export const useDashboard = () => {
         const unsubscribeProjects = setupProjectsListener(firebaseUser.uid);
         return () => unsubscribeProjects();
       } else {
+        setState({ projects: [], user: null, loading: false });
         router.push("/auth/login");
       }
     });

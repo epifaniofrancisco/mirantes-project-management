@@ -62,7 +62,8 @@ export function useProjectOperations() {
 
         const hasPermission =
           project.createdBy === user.uid ||
-          project.members.some((member) => member.userId === user.uid);
+          (project.members &&
+            project.members.some((member) => member.userId === user.uid));
 
         return { hasPermission, project };
       } catch (error) {
@@ -104,6 +105,7 @@ export function useProjectOperations() {
           status: "planning",
           createdBy: user.uid,
           members: [creatorMember],
+          memberIds: [user.uid],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -193,31 +195,52 @@ export function useProjectOperations() {
         projectSchema.parse(formData);
         return { success: true };
       } catch (error: any) {
-        if (error.name === "ZodError") {
+        console.error("Erro de validação:", error);
+
+        if (
+          error?.name === "ZodError" &&
+          error?.errors &&
+          Array.isArray(error.errors)
+        ) {
           const fieldErrors: Record<string, string> = {};
+
           error.errors.forEach((err: any) => {
-            if (err.path[0]) {
-              fieldErrors[err.path[0]] = err.message;
+            if (err?.path && Array.isArray(err.path) && err.path[0]) {
+              fieldErrors[err.path[0]] = err.message || "Campo inválido";
             }
           });
-          return { success: false, errors: fieldErrors };
+
+          return {
+            success: false,
+            errors:
+              Object.keys(fieldErrors).length > 0
+                ? fieldErrors
+                : { general: "Dados inválidos" },
+          };
         }
-        throw error;
+
+        // Outros tipos de erro
+        return {
+          success: false,
+          errors: {
+            general: error?.message || "Erro de validação desconhecido",
+          },
+        };
       }
     },
     [],
   );
 
   const parseError = useCallback((error: any, operation: string): string => {
-    if (error.message?.includes("não autenticado")) {
+    if (error?.message?.includes("não autenticado")) {
       return "Você precisa estar logado para realizar esta ação";
     }
 
-    if (error.message?.includes("Sem permissão")) {
+    if (error?.message?.includes("Sem permissão")) {
       return "Você não tem permissão para realizar esta ação";
     }
 
-    if (error.message?.includes("banco de dados")) {
+    if (error?.message?.includes("banco de dados")) {
       return "Erro de conexão. Verifique sua internet e tente novamente.";
     }
 
