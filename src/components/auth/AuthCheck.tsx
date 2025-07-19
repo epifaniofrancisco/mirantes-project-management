@@ -16,7 +16,7 @@ interface AuthCheckProps {
 
 export function AuthCheck({
   children,
-  redirectTo = "/login",
+  redirectTo = "/auth/login",
   requireAuth = true,
 }: AuthCheckProps) {
   const [loading, setLoading] = useState(true);
