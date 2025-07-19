@@ -33,7 +33,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 - [x] Dashboard com projetos do usuário
 - [x] Criar projeto (título, descrição, datas)
-- [ ] Editar projeto
+- [x] Editar projeto
 - [ ] Detalhes do projeto (membros, tarefas)
 - [ ] Atribuir membros a um projeto
 
@@ -89,14 +89,14 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 > ✅ Estas são as **funcionalidades mínimas** que precisam estar prontas para validação e entrega:
 
-- [ ] Autenticação (login, cadastro, logout)
-- [ ] Dashboard de projetos
-- [ ] Criar e visualizar projeto
+- [x] Autenticação (login, cadastro, logout)
+- [x] Dashboard de projetos
+- [x] Criar e visualizar projeto
 - [ ] Criar e visualizar tarefas
 - [ ] Atualizar status de tarefas
 - [ ] Atribuição de membros
 - [ ] Comentários básicos
-- [ ] Sincronização em tempo real (Firestore)
+- [x] Sincronização em tempo real (Firestore)
 
 ---
 
@@ -104,14 +104,14 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 ### ✅ Funcionalidades principais
 
-- [ ] Autenticação com Firebase
-- [ ] CRUD de projetos
+- [x] Autenticação com Firebase
+- [x] CRUD de projetos
 - [ ] CRUD de tarefas
 - [ ] Visualização em Kanban
 - [ ] Drag & Drop
 - [ ] Atribuição de responsáveis
 - [ ] Comentários em tarefas
-- [ ] Persistência em tempo real
+- [x] Persistência em tempo real
 
 ### 🧪 Funcionalidades avançadas (opcionais)
 
@@ -119,17 +119,16 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [ ] Etiquetas em tarefas
 - [ ] Estatísticas por projeto
 - [ ] Histórico de atividades
-- [ ] Upload de anexos
 
 ---
 
 ## 🧪 Testes Manuais
 
-- [ ] Criar e logar com conta de usuário
+- [x] Criar e logar com conta de usuário
 - [ ] Criar projeto e adicionar tarefas
 - [ ] Atualizar status das tarefas
 - [ ] Atribuir tarefas a outros usuários
-- [ ] Visualizar alterações em tempo real
+- [x] Visualizar alterações em tempo real
 - [ ] Ver comentários sendo salvos
 
 ---
@@ -138,9 +137,9 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 ```bash
 # Instale as dependências
-npm install
+pnpm install
 
 # Crie o arquivo .env.local e adicione as credenciais do Firebase
 
 # Rode o projeto
-npm run dev
+pnpm dev
