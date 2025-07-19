@@ -13,18 +13,17 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { Mail, ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
-import { useAuthForm } from "@/hooks/useAuthForm";
+import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
+import { useBaseForm } from "@/hooks/useBaseForm";
 import { ErrorAlert } from "@/components/base/ErrorAlert";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const INITIAL_FORGOT_PASSWORD_DATA: { email: string } = {
   email: "",
 };
 
 export const useForgotPasswordForm = () => {
-  const authForm = useAuthForm(INITIAL_FORGOT_PASSWORD_DATA);
+  const authForm = useBaseForm(INITIAL_FORGOT_PASSWORD_DATA);
 
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -62,42 +61,6 @@ const SuccessMessage: React.FC<{ email: string }> = ({ email }) => {
   );
 };
 
-const EmailNotFoundMessage: React.FC<{
-  email: string;
-  onTryAgain: () => void;
-  onGoToRegister: () => void;
-}> = ({ email, onTryAgain, onGoToRegister }) => {
-  return (
-    <div className="space-y-4">
-      <Alert variant="destructive">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Email não encontrado</strong>
-          <br />
-          Não encontramos uma conta criada com o email{" "}
-          <strong>{email}</strong>
-        </AlertDescription>
-      </Alert>
-
-      <div className="space-y-3">
-        <p className="text-center text-sm text-slate-600">
-          Verifique se digitou o email corretamente ou crie uma nova conta.
-        </p>
-
-        <div className="flex flex-col gap-2">
-          <Button variant="outline" onClick={onTryAgain} className="w-full">
-            Tentar outro email
-          </Button>
-
-          <Button onClick={onGoToRegister} className="w-full">
-            Criar nova conta
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default function ForgotPasswordPage(): React.ReactElement {
   const {
     state,
@@ -111,8 +74,6 @@ export default function ForgotPasswordPage(): React.ReactElement {
     router,
   } = useForgotPasswordForm();
 
-  const [showEmailNotFound, setShowEmailNotFound] = useState(false);
-
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -124,35 +85,20 @@ export default function ForgotPasswordPage(): React.ReactElement {
 
       setLoading(true);
       resetErrors();
-      setShowEmailNotFound(false);
 
       try {
-        console.log("Iniciando processo de recuperação de senha...");
-
         const validation = await ForgotPasswordService.validateFormData(
           state.formData,
         );
 
         if (!validation.success && validation.errors) {
-          console.log("Erro de validação:", validation.errors);
           setErrors(validation.errors);
           return;
         }
 
-        console.log("Validação passou, enviando email...");
-
         await ForgotPasswordService.sendResetEmail(state.formData);
-
-        console.log("Email enviado com sucesso!");
         setSuccess(true);
       } catch (error: any) {
-        console.error("Erro no processo de recuperação:", error);
-
-        if (error.code === "auth/user-not-found") {
-          setShowEmailNotFound(true);
-          return;
-        }
-
         const parsedError = ForgotPasswordService.parseFirebaseError(error);
 
         if (parsedError.type === "field" && parsedError.field) {
@@ -180,13 +126,8 @@ export default function ForgotPasswordPage(): React.ReactElement {
 
   const handleTryAgain = useCallback(() => {
     setSuccess(false);
-    setShowEmailNotFound(false);
     resetErrors();
   }, [setSuccess, resetErrors]);
-
-  const handleGoToRegister = useCallback(() => {
-    router.push("/auth/register");
-  }, [router]);
 
   const renderContent = () => {
     if (isSuccess) {
@@ -209,16 +150,6 @@ export default function ForgotPasswordPage(): React.ReactElement {
       );
     }
 
-    if (showEmailNotFound) {
-      return (
-        <EmailNotFoundMessage
-          email={state.formData.email}
-          onTryAgain={handleTryAgain}
-          onGoToRegister={handleGoToRegister}
-        />
-      );
-    }
-
     return (
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormField
@@ -237,7 +168,7 @@ export default function ForgotPasswordPage(): React.ReactElement {
 
         <LoadingButton
           isLoading={state.isLoading}
-          loadingText="Verificando..."
+          loadingText="Enviando..."
           defaultText="Enviar link de recuperação"
         />
       </form>
@@ -249,24 +180,18 @@ export default function ForgotPasswordPage(): React.ReactElement {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">
-            {isSuccess
-              ? "Email Enviado"
-              : showEmailNotFound
-                ? "Email Não Encontrado"
-                : "Recuperar Senha"}
+            {isSuccess ? "Email Enviado" : "Recuperar Senha"}
           </CardTitle>
           <CardDescription>
             {isSuccess
               ? "Verifique sua caixa de entrada"
-              : showEmailNotFound
-                ? "Este email não está registrado"
-                : "Digite seu email para receber um link de recuperação"}
+              : "Digite seu email para receber um link de recuperação"}
           </CardDescription>
         </CardHeader>
 
         <CardContent>{renderContent()}</CardContent>
 
-        {!isSuccess && !showEmailNotFound && (
+        {!isSuccess && (
           <CardFooter className="flex justify-center">
             <Button
               variant="ghost"

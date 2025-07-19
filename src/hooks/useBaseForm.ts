@@ -1,38 +1,33 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { LoginFormData, FormErrors } from "@/lib/types";
+import type { FormErrors } from "@/lib/types";
 
-export interface AuthFormState<T> {
+export interface BaseFormState<T> {
   formData: T;
   errors: FormErrors;
   isLoading: boolean;
   generalError: string;
 }
 
-export const useAuthForm = <T extends Record<string, any>>(
+export const useBaseForm = <T extends Record<string, any>>(
   initialFormData: T,
 ) => {
   const router = useRouter();
 
-  const INITIAL_STATE: AuthFormState<T> = {
+  const [state, setState] = useState<BaseFormState<T>>({
     formData: initialFormData,
     errors: {},
     isLoading: false,
     generalError: "",
-  };
+  });
 
-  const [state, setState] = useState<AuthFormState<T>>(INITIAL_STATE);
-
-  const updateFormData = useCallback(
-    (field: keyof T, value: string) => {
-      setState((prev) => ({
-        ...prev,
-        formData: { ...prev.formData, [field]: value },
-        errors: { ...prev.errors, [field]: "" }, // Clear field error on change
-      }));
-    },
-    [],
-  );
+  const updateFormData = useCallback((field: keyof T, value: string) => {
+    setState((prev) => ({
+      ...prev,
+      formData: { ...prev.formData, [field]: value },
+      errors: { ...prev.errors, [field]: "" },
+    }));
+  }, []);
 
   const setErrors = useCallback((errors: FormErrors) => {
     setState((prev) => ({ ...prev, errors }));
@@ -50,6 +45,26 @@ export const useAuthForm = <T extends Record<string, any>>(
     setState((prev) => ({ ...prev, errors: {}, generalError: "" }));
   }, []);
 
+  const resetForm = useCallback(() => {
+    setState({
+      formData: initialFormData,
+      errors: {},
+      isLoading: false,
+      generalError: "",
+    });
+  }, [initialFormData]);
+
+  const navigateBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
+  const navigateTo = useCallback(
+    (path: string) => {
+      router.push(path);
+    },
+    [router],
+  );
+
   return {
     state,
     updateFormData,
@@ -57,6 +72,9 @@ export const useAuthForm = <T extends Record<string, any>>(
     setGeneralError,
     setLoading,
     resetErrors,
+    resetForm,
+    navigateBack,
+    navigateTo,
     router,
   };
 };

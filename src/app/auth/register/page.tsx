@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useCallback } from "react";
 import {
   Card,
@@ -14,7 +13,7 @@ import { User, Mail, Lock } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { AuthLink } from "@/components/auth/AuthLink";
 import { LoadingButton } from "@/components/auth/LoadingButton";
-import { useAuthForm } from "@/hooks/useAuthForm";
+import { useBaseForm } from "@/hooks/useBaseForm";
 import { RegistrationService } from "@/services/registrationService";
 import { ErrorAlert } from "@/components/base/ErrorAlert";
 import type { RegisterFormData } from "@/lib/types";
@@ -33,8 +32,8 @@ export default function RegisterPage(): React.ReactElement {
     setGeneralError,
     setLoading,
     resetErrors,
-    router,
-  } = useAuthForm(INITIAL_REGISTER_DATA);
+    navigateTo,
+  } = useBaseForm(INITIAL_REGISTER_DATA);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -54,8 +53,7 @@ export default function RegisterPage(): React.ReactElement {
         }
 
         await RegistrationService.createUser(state.formData);
-
-        router.push("/dashboard");
+        navigateTo("/dashboard");
       } catch (error: any) {
         console.error("Registration error:", error);
 
@@ -76,13 +74,13 @@ export default function RegisterPage(): React.ReactElement {
       resetErrors,
       setErrors,
       setGeneralError,
-      router,
+      navigateTo,
     ],
   );
 
   const handleNavigateToLogin = useCallback(() => {
-    router.push("/auth/login");
-  }, [router]);
+    navigateTo("/auth/login");
+  }, [navigateTo]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">

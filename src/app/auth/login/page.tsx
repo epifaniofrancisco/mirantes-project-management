@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import {
   Card,
   CardContent,
@@ -14,7 +13,7 @@ import { AuthLink } from "@/components/auth/AuthLink";
 import { useCallback } from "react";
 import { FormField } from "@/components/auth/FormField";
 import { LoadingButton } from "@/components/auth/LoadingButton";
-import { useAuthForm } from "@/hooks/useAuthForm";
+import { useBaseForm } from "@/hooks/useBaseForm";
 import { LoginService } from "@/services/loginService";
 import type { LoginFormData } from "@/lib/types";
 import { ErrorAlert } from "@/components/base/ErrorAlert";
@@ -32,8 +31,8 @@ export default function LoginPage(): React.ReactElement {
     setGeneralError,
     setLoading,
     resetErrors,
-    router,
-  } = useAuthForm(INITIAL_LOGIN_DATA);
+    navigateTo,
+  } = useBaseForm(INITIAL_LOGIN_DATA);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -51,8 +50,7 @@ export default function LoginPage(): React.ReactElement {
         }
 
         await LoginService.signInUser(state.formData);
-
-        router.push("/dashboard");
+        navigateTo("/dashboard");
       } catch (error: any) {
         console.error("Login error:", error);
 
@@ -73,17 +71,17 @@ export default function LoginPage(): React.ReactElement {
       resetErrors,
       setErrors,
       setGeneralError,
-      router,
+      navigateTo,
     ],
   );
 
   const handleNavigateToRegister = useCallback(() => {
-    router.push("/auth/register");
-  }, [router]);
+    navigateTo("/auth/register");
+  }, [navigateTo]);
 
   const handleForgotPassword = useCallback(() => {
-    router.push("/auth/forgot-password");
-  }, [router]);
+    navigateTo("/auth/forgot-password");
+  }, [navigateTo]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
@@ -123,13 +121,12 @@ export default function LoginPage(): React.ReactElement {
 
             <div>
               <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  className="text-xs text-blue-500 transition-colors cursor-pointer hover:text-blue-600 focus:underline focus:outline-none"
-                >
-                  Esqueceu a senha?
-                </button>
-              
+                type="button"
+                onClick={handleForgotPassword}
+                className="cursor-pointer text-xs text-blue-500 transition-colors hover:text-blue-600 focus:underline focus:outline-none"
+              >
+                Esqueceu a senha?
+              </button>
             </div>
 
             {state.generalError && <ErrorAlert message={state.generalError} />}
