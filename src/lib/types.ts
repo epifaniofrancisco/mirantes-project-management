@@ -38,6 +38,19 @@ export interface ProjectMember {
   avatar?: string
 }
 
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: "todo" | "in-progress" | "completed";
+  assignedTo?: string;
+  assignedToName?: string;
+  dueDate?: string;
+  projectId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FormErrors {
   [key: string]: string;
 }
@@ -53,7 +66,6 @@ export const SIZE_CONFIG = {
 } as const;
 
 export type AvatarSize = keyof typeof SIZE_CONFIG;
-
 export type RegisterFormData = z.infer<typeof registerSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
