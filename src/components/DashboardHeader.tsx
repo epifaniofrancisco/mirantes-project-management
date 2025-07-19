@@ -1,7 +1,6 @@
 import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, LogOut } from "lucide-react";
-import { UserAvatar } from "@/components/base/UserAvatar";
 import type { User } from "@/lib/types";
 
 interface DashboardHeaderProps {
