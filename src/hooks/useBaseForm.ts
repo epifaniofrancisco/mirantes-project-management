@@ -29,6 +29,13 @@ export const useBaseForm = <T extends Record<string, any>>(
     }));
   }, []);
 
+  const updateMultipleFields = useCallback((updates: Partial<T>) => {
+    setState((prev) => ({
+      ...prev,
+      formData: { ...prev.formData, ...updates },
+    }));
+  }, []);
+
   const setErrors = useCallback((errors: FormErrors) => {
     setState((prev) => ({ ...prev, errors }));
   }, []);
@@ -65,9 +72,25 @@ export const useBaseForm = <T extends Record<string, any>>(
     [router],
   );
 
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      updateFormData(name as keyof T, value);
+    },
+    [updateFormData],
+  );
+
+  const handleSelectChange = useCallback(
+    (field: keyof T) => (value: string) => {
+      updateFormData(field, value);
+    },
+    [updateFormData],
+  );
+
   return {
     state,
     updateFormData,
+    updateMultipleFields,
     setErrors,
     setGeneralError,
     setLoading,
@@ -76,5 +99,7 @@ export const useBaseForm = <T extends Record<string, any>>(
     navigateBack,
     navigateTo,
     router,
+    handleInputChange,
+    handleSelectChange,
   };
 };

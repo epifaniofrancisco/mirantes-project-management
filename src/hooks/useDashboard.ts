@@ -9,11 +9,11 @@ import {
   onSnapshot,
   doc,
   getDoc,
-  deleteDoc,
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import type { Project, User } from "@/lib/types";
 import type { User as FirebaseUser } from "firebase/auth";
+import { useProjectOperations } from "./useProjectOperations";
 
 interface DashboardState {
   projects: Project[];
@@ -30,9 +30,14 @@ export const useDashboard = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string>("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const router = useRouter();
+
+  const {
+    deleteProject,
+    parseError,
+    isLoading: isDeleting,
+  } = useProjectOperations();
 
   const createUserFromFirebaseUser = useCallback(
     (firebaseUser: FirebaseUser, userData?: any): User => {
@@ -58,7 +63,6 @@ export const useDashboard = () => {
       try {
         const userDocRef = doc(db, "users", firebaseUser.uid);
         const userDoc = await getDoc(userDocRef);
-
         const userData = userDoc.exists() ? userDoc.data() : null;
         return createUserFromFirebaseUser(firebaseUser, userData);
       } catch (error) {
@@ -152,23 +156,17 @@ export const useDashboard = () => {
   const confirmDeleteProject = useCallback(async () => {
     if (!projectToDelete) return;
 
-    setIsDeleting(true);
-    setDeleteError("");
-
     try {
-      await deleteDoc(doc(db, "projects", projectToDelete));
-      
-      // Sucesso - fechar dialog e limpar estado
+      await deleteProject(projectToDelete);
       setDeleteDialogOpen(false);
       setProjectToDelete(null);
       setDeleteError("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao deletar projeto:", error);
-      setDeleteError("Erro ao deletar projeto. Tente novamente.");
-    } finally {
-      setIsDeleting(false);
+      const errorMessage = parseError(error, "delete");
+      setDeleteError(errorMessage);
     }
-  }, [projectToDelete]);
+  }, [projectToDelete, deleteProject, parseError]);
 
   const cancelDeleteProject = useCallback(() => {
     setDeleteDialogOpen(false);

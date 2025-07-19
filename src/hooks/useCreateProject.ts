@@ -1,9 +1,7 @@
 import { useCallback } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/lib/firebase";
-import { ProjectService } from "@/services/projectService";
 import { ProjectFormData } from "@/lib/types";
 import { useBaseForm } from "./useBaseForm";
+import { useProjectOperations } from "./useProjectOperations";
 
 const INITIAL_FORM_DATA: ProjectFormData = {
   title: "",
@@ -13,7 +11,6 @@ const INITIAL_FORM_DATA: ProjectFormData = {
 };
 
 export function useCreateProject() {
-  const [user] = useAuthState(auth);
   const {
     state,
     updateFormData,
@@ -23,13 +20,17 @@ export function useCreateProject() {
     resetErrors,
     navigateTo,
     navigateBack,
+    handleInputChange,
   } = useBaseForm(INITIAL_FORM_DATA);
+
+  const { createProject, validateProjectData, parseError, currentUser } =
+    useProjectOperations();
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!user) {
+      if (!currentUser) {
         setGeneralError("Você precisa estar logado para criar um projeto");
         return;
       }
@@ -38,24 +39,17 @@ export function useCreateProject() {
       resetErrors();
 
       try {
-        const validation = await ProjectService.validateFormData(
-          state.formData,
-        );
-
+        const validation = await validateProjectData(state.formData);
         if (!validation.success && validation.errors) {
           setErrors(validation.errors);
           return;
         }
 
-        const projectId = await ProjectService.createProject(
-          state.formData,
-          user.uid,
-        );
-
+        const projectId = await createProject(state.formData);
         navigateTo(`/projects/${projectId}`);
       } catch (error: any) {
         console.error("Erro ao criar projeto:", error);
-        const errorMessage = ProjectService.parseCreateProjectError(error);
+        const errorMessage = parseError(error, "create");
         setGeneralError(errorMessage);
       } finally {
         setLoading(false);
@@ -63,18 +57,22 @@ export function useCreateProject() {
     },
     [
       state.formData,
-      user,
+      currentUser,
       setLoading,
       resetErrors,
       setErrors,
       setGeneralError,
       navigateTo,
+      validateProjectData,
+      createProject,
+      parseError,
     ],
   );
 
   return {
     state,
     updateFormData,
+    handleInputChange,
     handleSubmit,
     navigateBack,
   };
