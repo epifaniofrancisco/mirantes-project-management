@@ -13,7 +13,7 @@ import { ArrowLeft } from "lucide-react";
 import { useCreateProject } from "@/hooks/useCreateProject";
 import { ProjectFormFields } from "@/components/projects/ProjectFormFields";
 import { ErrorAlert } from "@/components/base/ErrorAlert";
-import { LoadingButton } from "@/components/auth/LoadingButton";
+import { LoadingButton } from "@/components/base/LoadingButton";
 
 export default function NewProjectPage() {
   const { state, updateFormData, handleSubmit, navigateBack } =

@@ -12,7 +12,7 @@ import { Mail, Lock } from "lucide-react";
 import { AuthLink } from "@/components/auth/AuthLink";
 import { useCallback } from "react";
 import { FormField } from "@/components/base/FormField";
-import { LoadingButton } from "@/components/auth/LoadingButton";
+import { LoadingButton } from "@/components/base/LoadingButton";
 import { useBaseForm } from "@/hooks/useBaseForm";
 import { LoginService } from "@/services/loginService";
 import type { LoginFormData } from "@/lib/types";
