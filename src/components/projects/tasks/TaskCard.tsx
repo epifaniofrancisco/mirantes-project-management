@@ -10,6 +10,7 @@ import {
   Edit,
   Trash2,
   AlertTriangle,
+  MessageCircle
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,6 +26,7 @@ import type { Task, Project } from "@/lib/types";
 import { DeleteTaskDialog } from "./DeleteTaskDialog";
 import { useTaskOperations } from "@/hooks/projects/tasks/useTaskOperations";
 import { TaskFormDialog } from "./TaskFormDialog";
+import { TaskDetailsDialog } from "./TaskDetailsDialog";
 
 interface TaskCardProps {
   task: Task;
@@ -47,15 +49,27 @@ export function TaskCard({
 }: Readonly<TaskCardProps>) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+
 
   const { deleteTask, updateTask } = useTaskOperations();
 
   const isOverdue = isTaskOverdue(task);
 
+  const handleViewDetails = useCallback(() => {
+    setShowDetailsDialog(true);
+  }, []);
+
+  const handleEditFromDetails = useCallback(() => {
+    setShowDetailsDialog(false);
+    setShowEditDialog(true);
+  }, []);
+
   const handleEdit = useCallback(() => {
     if (onEdit) {
       onEdit(task);
     } else {
+      setShowDetailsDialog(false);
       setShowEditDialog(true);
     }
   }, [task, onEdit]);
@@ -118,9 +132,10 @@ export function TaskCard({
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
                 )}
                 <h3
-                  className={`line-clamp-2 font-semibold ${
+                  className={`line-clamp-2 cursor-pointer font-semibold transition-colors hover:text-blue-600 ${
                     compact ? "text-sm" : "text-base sm:text-lg"
                   } ${isOverdue ? "text-red-700" : ""}`}
+                  onClick={handleViewDetails}
                 >
                   {task.title}
                 </h3>
@@ -144,6 +159,10 @@ export function TaskCard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleViewDetails}>
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Ver Detalhes
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleEdit}>
                   <Edit className="mr-2 h-4 w-4" />
                   Editar
@@ -201,10 +220,7 @@ export function TaskCard({
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
               {assignedMember && (
                 <div className="flex items-center gap-2">
-                  <MemberAvatar
-                    member={assignedMember}
-                    size="sm"
-                  />
+                  <MemberAvatar member={assignedMember} size="sm" />
                 </div>
               )}
 
@@ -248,6 +264,14 @@ export function TaskCard({
         onConfirm={handleConfirmDelete}
       />
 
+      <TaskDetailsDialog
+        open={showDetailsDialog}
+        onOpenChange={setShowDetailsDialog}
+        task={task}
+        project={project}
+        onEdit={handleEditFromDetails}
+      />
+      
       <TaskFormDialog
         open={showEditDialog}
         onOpenChange={setShowEditDialog}

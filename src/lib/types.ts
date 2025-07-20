@@ -66,6 +66,19 @@ export interface TaskTag {
   createdAt: string;
 }
 
+export interface Comment {
+  id: string;
+  taskId: string;
+  projectId: string;
+  content: string;
+  createdBy: string;
+  createdByName: string;
+  createdByAvatar?: string;
+  createdAt: string;
+  updatedAt: string;
+  edited?: boolean;
+}
+
 export interface FormErrors {
   [key: string]: string;
 }
@@ -88,3 +101,4 @@ export type ProjectFormData = z.infer<typeof projectSchema>;
 export type MemberFormData = z.infer<typeof memberSchema>;
 export type TaskFormData = z.infer<typeof taskSchema>;
 export type TagFormData = z.infer<typeof tagSchema>;
+export type CommentFormData = z.infer<typeof commentSchema>;

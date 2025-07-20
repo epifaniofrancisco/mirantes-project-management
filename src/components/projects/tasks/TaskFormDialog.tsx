@@ -19,13 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Calendar, FileText } from "lucide-react";
+import { X, Plus, FileText, MessageCircle } from "lucide-react";
 import { useTaskOperations } from "@/hooks/projects/tasks/useTaskOperations";
 import type { Task, Project, TaskFormData } from "@/lib/types";
 import { LoadingButton } from "@/components/base/LoadingButton";
 import { ErrorAlert } from "@/components/base/ErrorAlert";
 import { FormField } from "@/components/base/FormField";
-
+import { CommentsList } from "./comments/CommentList";
 interface TaskFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -185,7 +185,9 @@ export function TaskFormDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <FormField
             id="title"
             label="Título"
@@ -386,6 +388,18 @@ export function TaskFormDialog({
             />
           </div>
         </form>
+        </div>
+
+        {isEditMode && task && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Discussão
+              </h3>
+              <CommentsList task={task} project={project} />
+            </div>
+          )}
+          </div>
       </DialogContent>
     </Dialog>
   );

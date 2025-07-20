@@ -53,7 +53,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] Lista detalhada de tarefas
 - [x] Visualização Kanban 
 - [x] Filtros por status, data, responsável
-- [ ]drag & drop (React DnD)
+- [ ] drag & drop (React DnD)
 - [ ] Busca por título da tarefa
 
 ---
@@ -96,7 +96,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] Atualizar status de tarefas
 - [x] Atribuição de membros
 - [x] Sincronização em tempo real (Firestore)
-- [ ] Comentários básicos
+- [x] Comentários básicos
 
 ---
 
@@ -111,7 +111,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] Atribuição de responsáveis
 - [x] Persistência em tempo real
 - [ ] Drag & Drop
-- [ ] Comentários em tarefas
+- [x] Comentários em tarefas
 
 ### 🧪 Funcionalidades avançadas (opcionais)
 
@@ -129,7 +129,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] Atualizar status das tarefas
 - [x] Atribuir tarefas a outros usuários
 - [x] Visualizar alterações em tempo real
-- [ ] Ver comentários sendo salvos
+- [x] Ver comentários sendo salvos
 
 ---
 

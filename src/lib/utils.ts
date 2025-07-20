@@ -143,3 +143,44 @@ export const getTasksBySearch = (tasks: Task[], searchTerm: string): Task[] => {
       task.tags?.some((tag) => tag.toLowerCase().includes(term)),
   );
 };
+
+// ...existing code...
+
+export const formatTimeAgo = (date: string): string => {
+  try {
+    const now = new Date();
+    const past = new Date(date);
+    const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return "há poucos segundos";
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `há ${diffInMinutes} minuto${diffInMinutes > 1 ? "s" : ""}`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `há ${diffInHours} hora${diffInHours > 1 ? "s" : ""}`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return `há ${diffInDays} dia${diffInDays > 1 ? "s" : ""}`;
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) {
+      return `há ${diffInWeeks} semana${diffInWeeks > 1 ? "s" : ""}`;
+    }
+
+    // Para períodos maiores, usar data formatada
+    return `em ${formatDate(date)}`;
+  } catch (error) {
+    console.error("Error formatting time ago:", error);
+    return formatDate(date);
+  }
+};
+
