@@ -11,7 +11,6 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] **TypeScript**
 - [x] **TailwindCSS**
 - [x] **Firebase** (Auth, Firestore, Storage, Notifications)
-- [ ] **Zustand** (gerenciamento de estado)
 - [ ] **React DnD** (drag & drop para Kanban)
 
 ---
@@ -41,19 +40,20 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 ### ✅ Tarefas
 
-- [ ] Criar tarefas com título, descrição, status, responsável, datas
-- [ ] Editar tarefas
-- [ ] Atualizar status: pendente / em andamento / concluída
-- [ ] Adicionar etiquetas (tags)
+- [x] Criar tarefas com título, descrição, status, responsável, datas
+- [x] Editar tarefas
+- [x] Atualizar status: pendente / em andamento / concluída
+- [x] Adicionar etiquetas (tags)
 - [ ] Anexar arquivos (imagens ou documentos)
 
 ---
 
 ### 🧾 Visualizações
 
-- [ ] Lista detalhada de tarefas
-- [ ] Visualização Kanban com drag & drop (React DnD)
-- [ ] Filtros por status, data, responsável
+- [x] Lista detalhada de tarefas
+- [x] Visualização Kanban 
+- [x] Filtros por status, data, responsável
+- [ ]drag & drop (React DnD)
 - [ ] Busca por título da tarefa
 
 ---
@@ -79,8 +79,8 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 ### 🔔 Notificações
 
-- [ ] Atualizações em tempo real (Firestore)
-- [ ] Alertas para tarefas vencidas
+- [x] Atualizações em tempo real (Firestore)
+- [x] Alertas para tarefas vencidas
 - [ ] Notificação ao ser mencionado ou atribuído
 
 ---
@@ -92,11 +92,11 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 - [x] Autenticação (login, cadastro, logout)
 - [x] Dashboard de projetos
 - [x] Criar e visualizar projeto
-- [ ] Criar e visualizar tarefas
-- [ ] Atualizar status de tarefas
+- [x] Criar e visualizar tarefas
+- [x] Atualizar status de tarefas
 - [x] Atribuição de membros
-- [ ] Comentários básicos
 - [x] Sincronização em tempo real (Firestore)
+- [ ] Comentários básicos
 
 ---
 
@@ -106,17 +106,17 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 - [x] Autenticação com Firebase
 - [x] CRUD de projetos
-- [ ] CRUD de tarefas
-- [ ] Visualização em Kanban
-- [ ] Drag & Drop
-- [ ] Atribuição de responsáveis
-- [ ] Comentários em tarefas
+- [x] CRUD de tarefas
+- [x] Visualização em Kanban
+- [x] Atribuição de responsáveis
 - [x] Persistência em tempo real
+- [ ] Drag & Drop
+- [ ] Comentários em tarefas
 
 ### 🧪 Funcionalidades avançadas (opcionais)
 
-- [ ] Filtros e busca
-- [ ] Etiquetas em tarefas
+- [x] Filtros e busca
+- [x] Etiquetas em tarefas
 - [ ] Estatísticas por projeto
 - [ ] Histórico de atividades
 
@@ -125,9 +125,9 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 ## 🧪 Testes Manuais
 
 - [x] Criar e logar com conta de usuário
-- [ ] Criar projeto e adicionar tarefas
-- [ ] Atualizar status das tarefas
-- [ ] Atribuir tarefas a outros usuários
+- [x] Criar projeto e adicionar tarefas
+- [x] Atualizar status das tarefas
+- [x] Atribuir tarefas a outros usuários
 - [x] Visualizar alterações em tempo real
 - [ ] Ver comentários sendo salvos
 

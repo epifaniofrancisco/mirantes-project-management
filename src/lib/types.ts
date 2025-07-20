@@ -1,6 +1,8 @@
 import { forgotPasswordSchema, loginSchema, registerSchema } from "@/lib/validations/auth";
 import { memberSchema, projectSchema } from "@/lib/validations/project";
 import type { z } from "zod";
+import { tagSchema, taskSchema } from "./validations/task";
+import { TaskPriority, TaskStatus } from "@/constants/tasks";
 
 export interface User {
   id: string;
@@ -43,13 +45,25 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: "todo" | "in-progress" | "completed";
+  status: TaskStatus;
   assignedTo?: string;
   assignedToName?: string;
+  assignedToAvatar?: string;
   dueDate?: string;
+  priority: TaskPriority;
+  tags: string[];
   projectId: string;
+  createdBy: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TaskTag {
+  id: string;
+  name: string;
+  color: string;
+  projectId: string;
+  createdAt: string;
 }
 
 export interface FormErrors {
@@ -72,4 +86,5 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ProjectFormData = z.infer<typeof projectSchema>;
 export type MemberFormData = z.infer<typeof memberSchema>;
-
+export type TaskFormData = z.infer<typeof taskSchema>;
+export type TagFormData = z.infer<typeof tagSchema>;
