@@ -1,94 +1,109 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
-import { useProjectOperations } from "@/hooks/projects/useProjectOperations";
+import { useTaskOperations } from "./tasks/useTaskOperations";
 import type { Project, Task } from "@/lib/types";
 
 interface UseProjectDetailsProps {
   projectId: string;
 }
 
-export function useProjectDetails({ projectId }: UseProjectDetailsProps) {
+interface UseProjectDetailsReturn {
+  project: Project | null;
+  tasks: Task[];
+  loading: boolean;
+  isOwner: boolean;
+  completedTasks: number;
+  totalTasks: number;
+  progressPercentage: number;
+  daysRemaining: number;
+  navigateToDashboard: () => void;
+  navigateToEdit: () => void;
+  navigateToMembers: () => void;
+}
+
+export function useProjectDetails({
+  projectId,
+}: UseProjectDetailsProps): UseProjectDetailsReturn {
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [user] = useAuthState(auth);
   const router = useRouter();
 
-  const { checkProjectPermissions } = useProjectOperations();
+  const { listenToTasks } = useTaskOperations();
 
-  // Buscar projeto e verificar permissões
-  useEffect(() => {
-    if (!projectId || !user) return;
+  const isOwner = project?.createdBy === user?.uid;
 
-    const loadProject = async () => {
-      try {
-        const { hasPermission, project: fetchedProject } =
-          await checkProjectPermissions(projectId, "view");
+  const fetchProject = useCallback(async () => {
+    if (!projectId || !user) {
+      setLoading(false);
+      return;
+    }
 
-        if (!fetchedProject) {
-          router.push("/dashboard");
-          return;
-        }
+    try {
+      setLoading(true);
 
-        if (!hasPermission) {
-          router.push("/dashboard");
-          return;
-        }
+      const projectDoc = await getDoc(doc(db, "projects", projectId));
 
-        setProject(fetchedProject);
-      } catch (error) {
-        console.error("Erro ao carregar projeto:", error);
+      if (!projectDoc.exists()) {
+        console.error("Projeto não encontrado:", projectId);
         router.push("/dashboard");
-      } finally {
+        return;
+      }
+
+      const projectData = {
+        id: projectDoc.id,
+        ...projectDoc.data(),
+      } as Project;
+
+      const hasAccess =
+        projectData.createdBy === user.uid ||
+        projectData.members?.some((member) => member.userId === user.uid);
+
+      if (!hasAccess) {
+        console.error("Usuário sem acesso ao projeto:", projectId);
+        router.push("/dashboard");
+        return;
+      }
+
+      setProject(projectData);
+
+      const unsubscribe = listenToTasks(projectId, (tasksData) => {
+        if (tasksData.length > 0) {
+          const firstTask = tasksData[0];
+        }
+
+        setTasks(tasksData);
         setLoading(false);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    } catch (error) {
+      console.error("Erro ao buscar projeto:", error);
+      setLoading(false);
+      router.push("/dashboard");
+    }
+  }, [projectId, user, router, listenToTasks]);
+
+  useEffect(() => {
+    const cleanup = fetchProject();
+
+    return () => {
+      if (cleanup) {
+        cleanup.then((cleanupFn) => {
+          if (cleanupFn) cleanupFn();
+        });
       }
     };
+  }, [fetchProject]);
 
-    loadProject();
-  }, [projectId, user, router, checkProjectPermissions]);
-
-  // Listener para tarefas em tempo real
-  useEffect(() => {
-    if (!projectId) return;
-
-    const tasksQuery = query(
-      collection(db, "tasks"),
-      where("projectId", "==", projectId),
-    );
-
-    const unsubscribeTasks = onSnapshot(tasksQuery, (snapshot) => {
-      const tasksData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Task[];
-      setTasks(tasksData);
-    });
-
-    return () => unsubscribeTasks();
-  }, [projectId]);
-
-  // Navegação
-  const navigateToDashboard = useCallback(() => {
-    router.push("/dashboard");
-  }, [router]);
-
-  const navigateToEdit = useCallback(() => {
-    if (project) {
-      router.push(`/projects/${project.id}/edit`);
-    }
-  }, [project, router]);
-
-  const navigateToMembers = useCallback(() => {
-    if (project) {
-      router.push(`/projects/${project.id}/members`);
-    }
-  }, [project, router]);
-
-  // Computações derivadas
-  const isOwner = project?.createdBy === user?.uid;
   const completedTasks = tasks.filter(
     (task) => task.status === "completed",
   ).length;
@@ -96,7 +111,7 @@ export function useProjectDetails({ projectId }: UseProjectDetailsProps) {
   const progressPercentage =
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  const daysRemaining = project
+  const daysRemaining = project?.endDate
     ? Math.max(
         0,
         Math.ceil(
@@ -106,21 +121,27 @@ export function useProjectDetails({ projectId }: UseProjectDetailsProps) {
       )
     : 0;
 
+  const navigateToDashboard = useCallback(() => {
+    router.push("/dashboard");
+  }, [router]);
+
+  const navigateToEdit = useCallback(() => {
+    router.push(`/projects/${projectId}/edit`);
+  }, [router, projectId]);
+
+  const navigateToMembers = useCallback(() => {
+    router.push(`/projects/${projectId}/members`);
+  }, [router, projectId]);
+
   return {
-    // Estado
     project,
     tasks,
     loading,
-    user,
-
-    // Computações
     isOwner,
     completedTasks,
     totalTasks,
     progressPercentage,
     daysRemaining,
-
-    // Navegação
     navigateToDashboard,
     navigateToEdit,
     navigateToMembers,

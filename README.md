@@ -62,7 +62,7 @@ Aplicação completa de gerenciamento de projetos com **React**, **Next.js** e *
 
 - [ ] Comentários com `@menção`
 - [ ] Histórico de atividades por tarefa
-- [ ] Atribuição de tarefas a membros
+- [x] Atribuição de tarefas a membros
 - [ ] Notificações para menções e alterações
 
 ---

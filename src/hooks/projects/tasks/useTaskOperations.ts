@@ -1,14 +1,16 @@
+"use client";
+
 import { useState, useCallback } from "react";
 import {
+  collection,
   addDoc,
   updateDoc,
   deleteDoc,
   doc,
-  collection,
   query,
   where,
-  onSnapshot,
   orderBy,
+  onSnapshot,
   Timestamp,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -16,35 +18,50 @@ import { auth, db } from "@/lib/firebase";
 import { taskSchema } from "@/lib/validations/task";
 import type { Task, TaskFormData, Project } from "@/lib/types";
 
-interface UseTaskOperationsReturn {
-  createTask: (
-    data: TaskFormData,
-    projectId: string,
-    project: Project,
-  ) => Promise<Task>;
-  updateTask: (
-    taskId: string,
-    data: Partial<TaskFormData>,
-    project: Project,
-  ) => Promise<void>;
-  deleteTask: (taskId: string) => Promise<void>;
-  updateTaskStatus: (taskId: string, status: Task["status"]) => Promise<void>;
-  batchUpdateTasks: (
-    updates: Array<{ id: string; data: Partial<TaskFormData> }>,
-  ) => Promise<void>;
+const convertTimestamp = (timestamp: any, fieldName: string): string => {
+  try {
+    if (!timestamp) {
+      console.warn(`⚠️ ${fieldName} is null/undefined`);
+      return new Date().toISOString();
+    }
 
-  listenToTasks: (
-    projectId: string,
-    callback: (tasks: Task[]) => void,
-  ) => () => void;
+    if (timestamp?.toDate && typeof timestamp.toDate === "function") {
+      const date = timestamp.toDate();
+      return date.toISOString();
+    }
 
-  parseTaskError: (error: any) => string;
+    // String de data
+    if (typeof timestamp === "string") {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.error(`Invalid date string: ${timestamp} for ${fieldName}`);
+        return new Date().toISOString();
+      }
+      return date.toISOString();
+    }
 
-  isLoading: boolean;
-  currentUser: ReturnType<typeof useAuthState>[0];
-}
+    if (timestamp instanceof Date) {
+      return timestamp.toISOString();
+    }
 
-export function useTaskOperations(): UseTaskOperationsReturn {
+    if (typeof timestamp === "number") {
+      const date = new Date(timestamp);
+      return date.toISOString();
+    }
+
+    console.error(
+      `Unknown timestamp type for ${fieldName}:`,
+      typeof timestamp,
+      timestamp,
+    );
+    return new Date().toISOString();
+  } catch (error) {
+    console.error(`Error converting ${fieldName}:`, error);
+    return new Date().toISOString();
+  }
+};
+
+export function useTaskOperations() {
   const [user] = useAuthState(auth);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,23 +74,69 @@ export function useTaskOperations(): UseTaskOperationsReturn {
 
   const enrichTaskWithAssignee = useCallback(
     (taskData: TaskFormData, project: Project) => {
-      if (!taskData.assignedTo) {
-        return {
-          ...taskData,
-          assignedToName: "",
-          assignedToAvatar: "",
-        };
-      }
-
-      const assignedMember = project.members?.find(
-        (member) => member.userId === taskData.assignedTo,
-      );
+      const assignedMember = taskData.assignedTo
+        ? project.members?.find(
+            (member) => member.userId === taskData.assignedTo,
+          )
+        : null;
 
       return {
         ...taskData,
-        assignedToName: assignedMember?.name || "",
-        assignedToAvatar: assignedMember?.avatar || "",
+        assignedToName: assignedMember?.name || assignedMember?.email || null,
+        assignedToAvatar: assignedMember?.avatar || null,
       };
+    },
+    [],
+  );
+
+  const listenToTasks = useCallback(
+    (projectId: string, callback: (tasks: Task[]) => void) => {
+      const tasksQuery = query(
+        collection(db, "tasks"),
+        where("projectId", "==", projectId),
+        orderBy("createdAt", "desc"),
+      );
+
+      return onSnapshot(
+        tasksQuery,
+        (snapshot) => {
+          const tasks = snapshot.docs.map((doc, index) => {
+            const data = doc.data();
+
+            console.log(`🔍 Processing task ${index + 1}:`, {
+              id: doc.id,
+              title: data.title,
+              createdAtRaw: data.createdAt,
+              createdAtType: typeof data.createdAt,
+              hasToDate: data.createdAt?.toDate ? "yes" : "no",
+              updatedAtRaw: data.updatedAt,
+              updatedAtType: typeof data.updatedAt,
+            });
+
+            const processedTask = {
+              id: doc.id,
+              ...data,
+              createdAt: convertTimestamp(data.createdAt, "createdAt"),
+              updatedAt: convertTimestamp(data.updatedAt, "updatedAt"),
+            } as Task;
+
+            console.log(`✅ Processed task ${index + 1}:`, {
+              id: processedTask.id,
+              title: processedTask.title,
+              createdAt: processedTask.createdAt,
+              updatedAt: processedTask.updatedAt,
+            });
+
+            return processedTask;
+          });
+
+          callback(tasks);
+        },
+        (error) => {
+          console.error("Erro no listener de tasks:", error);
+          callback([]);
+        },
+      );
     },
     [],
   );
@@ -101,12 +164,14 @@ export function useTaskOperations(): UseTaskOperationsReturn {
 
         const docRef = await addDoc(collection(db, "tasks"), newTaskData);
 
-        return {
+        const returnTask = {
           id: docRef.id,
           ...newTaskData,
           createdAt: newTaskData.createdAt.toDate().toISOString(),
           updatedAt: newTaskData.updatedAt.toDate().toISOString(),
         } as Task;
+
+        return returnTask;
       } catch (error) {
         console.error("Erro ao criar tarefa:", error);
         throw error;
@@ -120,129 +185,46 @@ export function useTaskOperations(): UseTaskOperationsReturn {
   const updateTask = useCallback(
     async (
       taskId: string,
-      taskData: Partial<TaskFormData>,
+      updates: Partial<TaskFormData>,
       project: Project,
     ): Promise<void> => {
-      validateUser();
       setIsLoading(true);
-
       try {
-        const updateData: Record<string, any> = {
-          ...taskData,
+        const enrichedUpdates = enrichTaskWithAssignee(
+          updates as TaskFormData,
+          project,
+        );
+        const updateData = {
+          ...enrichedUpdates,
           updatedAt: Timestamp.now(),
         };
 
-        if (taskData.assignedTo !== undefined) {
-          if (taskData.assignedTo) {
-            const assignedMember = project.members?.find(
-              (member) => member.userId === taskData.assignedTo,
-            );
-
-            if (assignedMember) {
-              updateData.assignedToName = assignedMember.name || "";
-              updateData.assignedToAvatar = assignedMember.avatar || "";
-            } else {
-              updateData.assignedToName = "";
-              updateData.assignedToAvatar = "";
-            }
-          } else {
-            updateData.assignedToName = "";
-            updateData.assignedToAvatar = "";
-          }
-        }
-
         await updateDoc(doc(db, "tasks", taskId), updateData);
       } catch (error) {
-        console.error("Erro ao atualizar tarefa:", error);
+        console.error("Erro ao atualizar task:", error);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [validateUser],
+    [enrichTaskWithAssignee],
   );
 
   const deleteTask = useCallback(
     async (taskId: string): Promise<void> => {
-      validateUser();
+      const currentUser = validateUser();
       setIsLoading(true);
 
       try {
         await deleteDoc(doc(db, "tasks", taskId));
       } catch (error) {
-        console.error("Erro ao deletar tarefa:", error);
+        console.error("Erro ao deletar task:", error);
         throw error;
       } finally {
         setIsLoading(false);
       }
     },
     [validateUser],
-  );
-
-  const updateTaskStatus = useCallback(
-    async (taskId: string, status: Task["status"]): Promise<void> => {
-      try {
-        await updateDoc(doc(db, "tasks", taskId), {
-          status,
-          updatedAt: Timestamp.now(),
-        });
-      } catch (error) {
-        console.error("Erro ao atualizar status:", error);
-        throw error;
-      }
-    },
-    [],
-  );
-
-  const batchUpdateTasks = useCallback(
-    async (
-      updates: Array<{ id: string; data: Partial<TaskFormData> }>,
-    ): Promise<void> => {
-      validateUser();
-      setIsLoading(true);
-
-      try {
-        const promises = updates.map(({ id, data }) =>
-          updateDoc(doc(db, "tasks", id), {
-            ...data,
-            updatedAt: Timestamp.now(),
-          }),
-        );
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Erro ao atualizar tarefas em lote:", error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [validateUser],
-  );
-
-  const listenToTasks = useCallback(
-    (projectId: string, callback: (tasks: Task[]) => void) => {
-      const tasksQuery = query(
-        collection(db, "tasks"),
-        where("projectId", "==", projectId),
-        orderBy("createdAt", "desc"),
-      );
-
-      return onSnapshot(tasksQuery, (snapshot) => {
-        const tasks = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt:
-            doc.data().createdAt?.toDate?.()?.toISOString() ||
-            new Date().toISOString(),
-          updatedAt:
-            doc.data().updatedAt?.toDate?.()?.toISOString() ||
-            new Date().toISOString(),
-        })) as Task[];
-        callback(tasks);
-      });
-    },
-    [],
   );
 
   const parseTaskError = useCallback((error: any): string => {
@@ -250,11 +232,7 @@ export function useTaskOperations(): UseTaskOperationsReturn {
       return "Você precisa estar logado para realizar esta ação";
     }
 
-    if (error?.name === "ZodError") {
-      return "Dados da tarefa são inválidos";
-    }
-
-    if (error?.message?.includes("permission")) {
+    if (error?.message?.includes("permissão")) {
       return "Você não tem permissão para realizar esta ação";
     }
 
@@ -262,21 +240,11 @@ export function useTaskOperations(): UseTaskOperationsReturn {
   }, []);
 
   return {
-    // Operations
     createTask,
     updateTask,
     deleteTask,
-    updateTaskStatus,
-    batchUpdateTasks,
-
-    // Listeners
     listenToTasks,
-
-    // Utils
     parseTaskError,
-
-    // State
     isLoading,
-    currentUser: user,
   };
 }
