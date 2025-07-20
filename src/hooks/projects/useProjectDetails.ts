@@ -1,14 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "@/lib/firebase";
-import { useProjectOperations } from "@/hooks/useProjectOperations";
+import { useProjectOperations } from "@/hooks/projects/useProjectOperations";
 import type { Project, Task } from "@/lib/types";
 
 interface UseProjectDetailsProps {

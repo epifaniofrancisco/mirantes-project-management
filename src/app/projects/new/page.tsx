@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
-import { useCreateProject } from "@/hooks/useCreateProject";
+import { useCreateProject } from "@/hooks/projects/useCreateProject";
 import { ProjectFormFields } from "@/components/projects/ProjectFormFields";
 import { ErrorAlert } from "@/components/base/ErrorAlert";
 import { LoadingButton } from "@/components/base/LoadingButton";

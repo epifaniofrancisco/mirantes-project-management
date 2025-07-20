@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Project, ProjectFormData } from "@/lib/types";
 import { useBaseForm } from "@/hooks/useBaseForm";
-import { useProjectOperations } from "@/hooks/useProjectOperations";
+import { useProjectOperations } from "@/hooks/projects/useProjectOperations";
 
 interface UseEditProjectProps {
   projectId: string;
